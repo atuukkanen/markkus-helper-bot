@@ -1,29 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Discord.Commands;
 
 namespace DiscordBot.Bot.MessageHandlers
 {
     internal class DogPicHandler : BaseHandler
     {
-        private readonly List<string> _links = new List<string>();
-        private readonly static Random random = new Random();
+        private readonly DogPicProvider _dogPicProvider;
 
         public DogPicHandler()
         {
-            _links.Add("https://pbs.twimg.com/profile_images/639599645925076994/7Egv8qXQ.jpg");
-            _links.Add("http://cdn2-www.dogtime.com/assets/uploads/gallery/siberian-husky-dog-breed-pictures/thumbs/thumbs_siberian-husky-dog-breed-pictures-3.jpg");
-            _links.Add("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Czech-wolfdog.jpg/220px-Czech-wolfdog.jpg");
+            _dogPicProvider = new DogPicProvider();
         }
 
-        protected override string GetMessageReply(string content)
+        protected override string GetMessageReply(string content, SocketCommandContext context)
         {
-            if (_links.Count == 0)
+            var path = _dogPicProvider.GetDogFilePath();
+            if (path == null)
             {
-                return null;
+                return "Sniff, ei onnistunut nyt.";
             }
 
-            var index = random.Next(_links.Count);
-            return "<" + _links[index] + ">";
+            var channel = context.Channel;
+            channel.SendFileAsync(path);
+            return null;
         }
     }
 }

@@ -1,25 +1,26 @@
-﻿using Discord;
-using Discord.WebSocket;
-using DiscordBot.Bot.MessageHandlers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Discord;
+using Discord.Commands;
+using Discord.WebSocket;
+using DiscordBot.Bot.MessageHandlers;
 
 namespace DiscordBot.Bot
 {
     internal class MyDiscordBot
     {
-        private DiscordSocketClient _client = new DiscordSocketClient();
-        private readonly string _token;
-
         private readonly Dictionary<string, IMessageHandler> _handlers = new Dictionary<string, IMessageHandler>();
+        private readonly string _token;
 
         public MyDiscordBot(string token)
         {
             _token = token;
-            _client.MessageReceived += MessageReceived;
+            Client.MessageReceived += MessageReceived;
         }
+
+        public DiscordSocketClient Client { get; } = new DiscordSocketClient();
 
         public void AddHandler(string prefix, IMessageHandler handler)
         {
@@ -27,16 +28,19 @@ namespace DiscordBot.Bot
             {
                 throw new ArgumentException(nameof(prefix));
             }
+
             _handlers.Add(prefix, handler);
         }
 
         private async Task MessageReceived(SocketMessage message)
         {
+            var context = new SocketCommandContext(Client, message as SocketUserMessage);
+
             var prefix = message.Content.Split(' ').First();
 
             if (_handlers.ContainsKey(prefix))
             {
-                await _handlers[prefix].MessageReceived(message).ConfigureAwait(false);
+                await _handlers[prefix].MessageReceived(message, context).ConfigureAwait(false);
             }
         }
 
@@ -44,8 +48,8 @@ namespace DiscordBot.Bot
         {
             return Task.Run(async () =>
             {
-                await _client.LoginAsync(TokenType.Bot, _token).ConfigureAwait(false);
-                await _client.StartAsync().ConfigureAwait(false);
+                await Client.LoginAsync(TokenType.Bot, _token).ConfigureAwait(false);
+                await Client.StartAsync().ConfigureAwait(false);
                 await Task.Delay(-1);
             });
         }
