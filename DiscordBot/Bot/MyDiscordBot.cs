@@ -6,30 +6,47 @@ using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using DiscordBot.Bot.MessageHandlers;
+using DiscordBot.Bot.StateChangeHandlers;
 
 namespace DiscordBot.Bot
 {
     internal class MyDiscordBot
     {
-        private readonly Dictionary<string, IMessageHandler> _handlers = new Dictionary<string, IMessageHandler>();
+        private readonly Dictionary<string, IMessageHandler> _commandHandlers = new Dictionary<string, IMessageHandler>();
+        private readonly List<IStateChangeHandler> _stateChangeHandlers = new List<IStateChangeHandler>();
         private readonly string _token;
 
         public MyDiscordBot(string token)
         {
             _token = token;
             Client.MessageReceived += MessageReceived;
+            Client.UserVoiceStateUpdated += UserVoiceStateUpdated;
+            Client.Ready += async () => { await Initialize(); };
         }
 
         public DiscordSocketClient Client { get; } = new DiscordSocketClient();
 
-        public void AddHandler(string prefix, IMessageHandler handler)
+        public void AddCommandHandler(string prefix, IMessageHandler handler)
         {
-            if (_handlers.ContainsKey(prefix))
+            if (_commandHandlers.ContainsKey(prefix))
             {
                 throw new ArgumentException(nameof(prefix));
             }
 
-            _handlers.Add(prefix, handler);
+            _commandHandlers.Add(prefix, handler);
+        }
+
+        public void AddStateChangeHandler(IStateChangeHandler handler)
+        {
+            _stateChangeHandlers.Add(handler);
+        }
+
+        private async Task Initialize()
+        {
+            foreach (var handler in _stateChangeHandlers)
+            {
+                await handler.Initialize();
+            }
         }
 
         private async Task MessageReceived(SocketMessage message)
@@ -38,10 +55,20 @@ namespace DiscordBot.Bot
 
             var prefix = message.Content.Split(' ').First();
 
-            if (_handlers.ContainsKey(prefix))
+            if (_commandHandlers.ContainsKey(prefix))
             {
-                await _handlers[prefix].MessageReceived(message, context).ConfigureAwait(false);
+                await _commandHandlers[prefix].MessageReceived(message, context).ConfigureAwait(false);
             }
+        }
+
+        private Task UserVoiceStateUpdated(SocketUser arg1, SocketVoiceState arg2, SocketVoiceState arg3)
+        {
+            foreach (var handler in _stateChangeHandlers)
+            {
+                handler.OnStateChanged();
+            }
+
+            return Task.CompletedTask;
         }
 
         public Task Run()

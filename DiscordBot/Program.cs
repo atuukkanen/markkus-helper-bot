@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using DiscordBot.Bot;
 using DiscordBot.Bot.MessageHandlers;
+using DiscordBot.Bot.StateChangeHandlers;
 using DiscordBot.Configuration;
 
 namespace DiscordBot
@@ -20,12 +21,13 @@ namespace DiscordBot
 
             var token = Config.Instance.Discord.ClientToken;
             var bot = new MyDiscordBot(token);
-            bot.AddHandler("ping", new PingHandler());
-            bot.AddHandler("doge", new DogPicHandler());
-            bot.AddHandler("voice", new VoiceChannelDataHandler(bot.Client));
+            bot.AddCommandHandler("ping", new PingHandler());
+            bot.AddCommandHandler("doge", new DogPicHandler());
+            bot.AddCommandHandler("voice", new VoiceChannelDataHandler(bot.Client));
+            bot.AddStateChangeHandler(new VoiceStateChangeHandler(bot.Client));
 
             var issueHandler = new IssueHandler();
-            bot.AddHandler(issueHandler.Prefix, issueHandler);
+            bot.AddCommandHandler(issueHandler.Prefix, issueHandler);
 
             Console.WriteLine("Running bot...");
 

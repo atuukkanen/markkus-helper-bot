@@ -2,36 +2,33 @@
 {
     public class Config
     {
+        private static Config _config;
+
         private Config()
         {
         }
 
-        private static Config _config = null;
+        public static Config Instance => _config ?? (_config = ReadConfig());
 
-        public static Config Instance
-        {
-            get
-            {
-                if (_config == null)
-                {
-                    _config = ReadConfig();
-                }
-                return _config;
-            }
-        }
+        public DiscordConfig Discord { get; set; }
 
         private static Config ReadConfig()
         {
-            var newConfig = new Config();
-            newConfig.Discord = new DiscordConfig { ClientToken = "" };
+            var newConfig = new Config
+            {
+                Discord = new DiscordConfig
+                {
+                    ClientToken = "",
+                    DarkroomApiToken = ""
+                }
+            };
             return newConfig;
         }
 
         public class DiscordConfig
         {
             public string ClientToken { get; set; }
+            public string DarkroomApiToken { get; set; }
         }
-
-        public DiscordConfig Discord { get; set; }
     }
 }

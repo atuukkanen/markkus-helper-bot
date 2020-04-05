@@ -176,6 +176,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bot\Common\HttpClientWrapper.cs" />
     <Compile Include="Bot\MessageHandlers\BaseHandler.cs" />
     <Compile Include="Bot\MessageHandlers\DogPicHandler.cs" />
     <Compile Include="Bot\MessageHandlers\IMessageHandler.cs" />
@@ -184,6 +185,8 @@
     <Compile Include="Bot\MessageHandlers\VoiceChannelDataHandler.cs" />
     <Compile Include="Bot\Model\Issue.cs" />
     <Compile Include="Bot\MyDiscordBot.cs" />
+    <Compile Include="Bot\StateChangeHandlers\IStateChangeHandler.cs" />
+    <Compile Include="Bot\StateChangeHandlers\VoiceStateChangeHandler.cs" />
     <Compile Include="Config\Config.cs" />
     <Compile Include="DogPicProvider.cs" />
     <Compile Include="Program.cs" />
@@ -193,6 +196,5 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

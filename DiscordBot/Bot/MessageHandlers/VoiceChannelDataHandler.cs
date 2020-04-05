@@ -24,7 +24,7 @@ namespace DiscordBot.Bot.MessageHandlers
                 return "Apua";
             }
 
-            var someoneActive = guild.Channels.Where(x => x as SocketVoiceChannel != null).Any(x => x.Users.Any(u => !u.IsBot));
+            var someoneActive = guild.Channels.Where(x => x is SocketVoiceChannel).Any(x => x.Users.Any(u => !u.IsBot));
             return someoneActive ? "Jeij!" : "Sniff.";
         }
     }
