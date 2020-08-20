@@ -4,3 +4,6 @@ services:
     build:
       context: DiscordBot
     restart: always
+    environment:
+      - DiscordClientToken=
+      - DarkroomApiToken=
