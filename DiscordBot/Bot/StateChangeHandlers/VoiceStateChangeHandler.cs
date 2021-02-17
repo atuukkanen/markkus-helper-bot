@@ -40,7 +40,7 @@ namespace DiscordBot.Bot.StateChangeHandlers
 
             var someoneActive = guild.Channels.Where(x => x is SocketVoiceChannel).Any(x => x.Users.Any(u => !u.IsBot));
 
-            var updatePath = @"https://ttkamerat.fi/darkroom/api/v1/sensors/post?value="
+            var updatePath = @"https://api.ttkamerat.fi/darkroom/api/v1/sensors/post?value="
                              + (someoneActive ? 1 : 0)
                              + @"&sensor=voice1&token="
                              + Config.Instance.Discord.DarkroomApiToken;
